@@ -9,6 +9,7 @@ public struct MediaAssetTimecodeRemuxer: Sendable {
         _ source: URL,
         to output: URL,
         frameNumber: Int32,
+        phaseWithinFrame: Double? = nil,
         format: MediaTimecodeFormat
     ) async throws {
         let source = source.standardizedFileURL
@@ -24,6 +25,16 @@ public struct MediaAssetTimecodeRemuxer: Sendable {
             throw MediaAssetTimecodeRemuxError.output_exists(
                 output
             )
+        }
+
+        if let phaseWithinFrame {
+            guard phaseWithinFrame.isFinite,
+                  phaseWithinFrame >= 0,
+                  phaseWithinFrame < 1 else {
+                throw MediaAssetTimecodeRemuxError.invalid_timecode_phase(
+                    phaseWithinFrame
+                )
+            }
         }
 
         let asset = AVURLAsset(
@@ -79,9 +90,11 @@ public struct MediaAssetTimecodeRemuxer: Sendable {
             sourceFormatHint: timecodeDescription
         )
 
-        timecodeInput.mediaTimeScale = try await referenceVideoTrack.load(
+        let referenceTimeScale = try await referenceVideoTrack.load(
             .naturalTimeScale
         )
+
+        timecodeInput.mediaTimeScale = referenceTimeScale
 
         guard writer.canAdd(
             timecodeInput
@@ -206,14 +219,74 @@ public struct MediaAssetTimecodeRemuxer: Sendable {
             for: timecodeInput
         )
 
-        let timecodeSample = try MediaTimecodeSampleFactory(
+        let timecodeFactory = MediaTimecodeSampleFactory(
             format: format
-        ).sample(
-            frameNumber: frameNumber,
-            presentationTime: .zero,
-            duration: duration,
-            formatDescription: timecodeDescription
         )
+
+        var timecodeSamples = [
+            try timecodeFactory.sample(
+                frameNumber: frameNumber,
+                presentationTime: .zero,
+                duration: duration,
+                formatDescription: timecodeDescription
+            ),
+        ]
+
+        if let phaseWithinFrame,
+           phaseWithinFrame > 0 {
+            let unscaledBoundary = CMTimeMultiplyByFloat64(
+                format.frameDuration,
+                multiplier: 1 - phaseWithinFrame
+            )
+
+            let boundary = CMTimeConvertScale(
+                unscaledBoundary,
+                timescale: referenceTimeScale,
+                method: .roundHalfAwayFromZero
+            )
+
+            guard boundary.isValid,
+                  boundary.isNumeric,
+                  CMTimeCompare(
+                      boundary,
+                      .zero
+                  ) > 0,
+                  CMTimeCompare(
+                      boundary,
+                      duration
+                  ) < 0 else {
+                throw MediaAssetTimecodeRemuxError
+                    .timecode_phase_boundary_outside_media
+            }
+
+            let nextFrame = frameNumber.addingReportingOverflow(
+                1
+            )
+
+            guard !nextFrame.overflow else {
+                throw MediaAssetTimecodeRemuxError.timecode_frame_overflow(
+                    frameNumber
+                )
+            }
+
+            timecodeSamples = [
+                try timecodeFactory.sample(
+                    frameNumber: frameNumber,
+                    presentationTime: .zero,
+                    duration: boundary,
+                    formatDescription: timecodeDescription
+                ),
+                try timecodeFactory.sample(
+                    frameNumber: nextFrame.partialValue,
+                    presentationTime: boundary,
+                    duration: CMTimeSubtract(
+                        duration,
+                        boundary
+                    ),
+                    formatDescription: timecodeDescription
+                ),
+            ]
+        }
 
         do {
             try writer.start()
@@ -224,9 +297,11 @@ public struct MediaAssetTimecodeRemuxer: Sendable {
 
             try reader.start()
 
-            try await timecodeReceiver.append(
-                timecodeSample
-            )
+            for sample in timecodeSamples {
+                try await timecodeReceiver.append(
+                    sample
+                )
+            }
 
             timecodeReceiver.finish()
 

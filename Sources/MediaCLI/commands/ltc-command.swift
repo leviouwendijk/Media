@@ -88,6 +88,31 @@ enum LTCCommand:
                         separator: " "
                     )
                 )
+
+                let samples = try await MediaAssetTimecodeReader()
+                    .samples(
+                        source
+                    )
+
+                for (
+                    index,
+                    sample
+                ) in samples.enumerated() {
+                    print(
+                        [
+                            "tmcd_sample",
+                            "index=\(index)",
+                            "frame=\(sample.frameNumber)",
+                            "pts=\(sample.presentationTimeSeconds)",
+                            "pts_raw=\(sample.presentationTimeValue)/\(sample.presentationTimeTimescale)",
+                            "duration=\(sample.durationSeconds)",
+                            "duration_raw=\(sample.durationValue)/\(sample.durationTimescale)",
+                        ]
+                        .joined(
+                            separator: " "
+                        )
+                    )
+                }
             } catch {
                 print(
                     "native_tmcd_error \(error.localizedDescription)"
@@ -256,6 +281,7 @@ enum LTCCommand:
                     source,
                     to: output,
                     frameNumber: frameNumber,
+                    phaseWithinFrame: anchor.phaseWithinContainingFrame,
                     format: signal.format.mediaTimecodeFormat
                 )
             }

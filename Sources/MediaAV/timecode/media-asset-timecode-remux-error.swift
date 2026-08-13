@@ -12,6 +12,13 @@ public enum MediaAssetTimecodeRemuxError:
     )
     case no_video_track
     case invalid_duration
+    case invalid_timecode_phase(
+        Double
+    )
+    case timecode_frame_overflow(
+        Int32
+    )
+    case timecode_phase_boundary_outside_media
     case missing_format_description(
         Int32
     )
@@ -42,6 +49,15 @@ public enum MediaAssetTimecodeRemuxError:
 
         case .invalid_duration:
             return "Media asset has no finite positive duration."
+
+        case .invalid_timecode_phase(let phase):
+            return "Timecode phase must be finite and in [0, 1): \(phase)."
+
+        case .timecode_frame_overflow(let frame):
+            return "Timecode frame cannot advance beyond TimeCode32: \(frame)."
+
+        case .timecode_phase_boundary_outside_media:
+            return "Timecode phase boundary does not fall inside the media duration."
 
         case .missing_format_description(let id):
             return "Media track \(id) has no format description for passthrough."

@@ -8,6 +8,31 @@ public struct MediaAssetTimecodeReader: Sendable {
     public func firstFrameNumber(
         _ url: URL
     ) async throws -> Int32 {
+        let samples = try await samples(
+            url
+        )
+
+        guard let sample = samples.first else {
+            throw MediaAssetTimecodeReadError.no_timecode_sample
+        }
+
+        return sample.frameNumber
+    }
+
+    public func frameNumbers(
+        _ url: URL
+    ) async throws -> [Int32] {
+        try await samples(
+            url
+        )
+        .map(
+            \.frameNumber
+        )
+    }
+
+    public func samples(
+        _ url: URL
+    ) async throws -> [MediaTimecodeSampleReadback] {
         let url = url.standardizedFileURL
 
         let asset = AVURLAsset(
@@ -44,57 +69,88 @@ public struct MediaAssetTimecodeReader: Sendable {
 
         try reader.start()
 
+        var samples: [MediaTimecodeSampleReadback] = []
+
         while let dynamic = try await provider.next() {
             if dynamic.contentType == .markerOnly {
                 continue
             }
 
-            guard let sample = CMReadySampleBuffer<CMReadOnlyDataBlockBuffer>(
+            guard let sample = CMReadySampleBuffer<
+                CMReadOnlyDataBlockBuffer
+            >(
                 dynamic
             ) else {
-                throw MediaAssetTimecodeReadError.unexpected_timecode_content_type(
-                    String(
-                        describing: dynamic.contentType
+                throw MediaAssetTimecodeReadError
+                    .unexpected_timecode_content_type(
+                        String(
+                            describing: dynamic.contentType
+                        )
                     )
+            }
+
+            let frame = try frameNumber(
+                from: Data(
+                    sample.content
+                )
+            )
+
+            let presentationTime = sample.withUnsafeSampleBuffer {
+                CMSampleBufferGetPresentationTimeStamp(
+                    $0
                 )
             }
 
-            let data = Data(
-                sample.content
-            )
-
-            guard data.count >= MemoryLayout<Int32>.size else {
-                throw MediaAssetTimecodeReadError.invalid_sample_size(
-                    data.count
+            let duration = sample.withUnsafeSampleBuffer {
+                CMSampleBufferGetDuration(
+                    $0
                 )
             }
 
-            let byte0 = UInt32(
-                data[0]
-            ) << 24
-
-            let byte1 = UInt32(
-                data[1]
-            ) << 16
-
-            let byte2 = UInt32(
-                data[2]
-            ) << 8
-
-            let byte3 = UInt32(
-                data[3]
-            )
-
-            let value = byte0
-                | byte1
-                | byte2
-                | byte3
-
-            return Int32(
-                bitPattern: value
+            samples.append(
+                MediaTimecodeSampleReadback(
+                    frameNumber: frame,
+                    presentationTimeValue: presentationTime.value,
+                    presentationTimeTimescale: presentationTime.timescale,
+                    durationValue: duration.value,
+                    durationTimescale: duration.timescale
+                )
             )
         }
 
-        throw MediaAssetTimecodeReadError.no_timecode_sample
+        guard !samples.isEmpty else {
+            throw MediaAssetTimecodeReadError.no_timecode_sample
+        }
+
+        return samples
+    }
+}
+
+private extension MediaAssetTimecodeReader {
+    func frameNumber(
+        from data: Data
+    ) throws -> Int32 {
+        guard data.count >= MemoryLayout<Int32>.size else {
+            throw MediaAssetTimecodeReadError.invalid_sample_size(
+                data.count
+            )
+        }
+
+        let value = UInt32(
+            data[0]
+        ) << 24
+            | UInt32(
+                data[1]
+            ) << 16
+            | UInt32(
+                data[2]
+            ) << 8
+            | UInt32(
+                data[3]
+            )
+
+        return Int32(
+            bitPattern: value
+        )
     }
 }

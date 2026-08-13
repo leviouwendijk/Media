@@ -77,7 +77,9 @@ func makeSyntheticTimecodeMovie(
         ]
     )
 
-    videoInput.mediaTimeScale = 25
+    let mediaTimeScale: CMTimeScale = 25_000
+
+    videoInput.mediaTimeScale = mediaTimeScale
 
     let audioInput = AVAssetWriterInput(
         mediaType: .audio,
@@ -100,6 +102,8 @@ func makeSyntheticTimecodeMovie(
         outputSettings: nil,
         sourceFormatHint: description
     )
+
+    timecodeInput.mediaTimeScale = mediaTimeScale
 
     let videoReceiver = writer.inputPixelBufferReceiver(
         for: videoInput,
@@ -156,9 +160,9 @@ func makeSyntheticTimecodeMovie(
             pixelBuffer,
             with: CMTime(
                 value: CMTimeValue(
-                    frame
+                    frame * 1_000
                 ),
-                timescale: 25
+                timescale: mediaTimeScale
             )
         )
     }

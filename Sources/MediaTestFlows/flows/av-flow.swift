@@ -285,6 +285,63 @@ extension MediaFlowSuite {
                 )
             }
 
+            Step("phase-aligned tmcd persists LTC boundary sample") {
+                let workspace = try MediaTestWorkspace(
+                    "av-timecode-phase"
+                )
+
+                defer {
+                    workspace.remove()
+                }
+
+                let source = workspace.file(
+                    "source.mov"
+                )
+
+                let output = workspace.file(
+                    "phase.mov"
+                )
+
+                try await makeSyntheticTimecodeMovie(
+                    at: source
+                )
+
+                try await MediaAssetTimecodeRemuxer().remux(
+                    source,
+                    to: output,
+                    frameNumber: 42,
+                    phaseWithinFrame: 0.5,
+                    format: .fps(
+                        25
+                    )
+                )
+
+                let frames = try await MediaAssetTimecodeReader()
+                    .frameNumbers(
+                        output
+                    )
+
+                try Expect.equal(
+                    frames,
+                    [
+                        42,
+                        43,
+                    ],
+                    "media-av.timecode.phase-samples"
+                )
+
+                let essence = try await MediaAssetEssenceVerifier()
+                    .verify(
+                        source,
+                        against: output
+                    )
+
+                try Expect.true(
+                    essence.totalByteCount > 0,
+                    "media-av.timecode.phase-preserves-essence"
+                )
+            }
+
             Step("audio reader decodes generated WAV to float32 chunks") {
                 let workspace = try MediaTestWorkspace(
                     "av-audio-reader"
