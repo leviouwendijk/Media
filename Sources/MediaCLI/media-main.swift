@@ -8,6 +8,8 @@ enum MediaCommand: ArgumentCommand {
 
     static let children: [ArgumentCommandType] = [
         Help.self,
+        InspectCommand.self,
+        LTCCommand.self,
     ]
 
     enum Help: RunnableArgumentCommand {

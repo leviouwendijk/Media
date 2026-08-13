@@ -5,7 +5,8 @@ import PackageDescription
 let package = Package(
     name: "Media",
     platforms: [
-        .macOS(.v14),
+        // .macOS(.v14),
+        .macOS(.v26), // for using latest Homebrew libltc bottle
     ],
     products: [
         .library(
@@ -27,6 +28,12 @@ let package = Package(
             ]
         ),
         .library(
+            name: "MediaPath",
+            targets: [
+                "MediaPath",
+            ]
+        ),
+        .library(
             name: "MediaLTC",
             targets: [
                 "MediaLTC",
@@ -38,14 +45,52 @@ let package = Package(
                 "MediaCLI",
             ]
         ),
+        .executable(
+            name: "mediatest",
+            targets: [
+                "MediaTestFlows",
+            ]
+        ),
     ],
     dependencies: [
         .package(
             url: "https://github.com/leviouwendijk/Arguments.git",
             branch: "master"
         ),
+        .package(
+            url: "https://github.com/leviouwendijk/Terminal.git",
+            branch: "master"
+        ),
+        .package(
+            url: "https://github.com/leviouwendijk/Path.git",
+            branch: "master"
+        ),
+        .package(
+            url: "https://github.com/leviouwendijk/FileTypes.git",
+            branch: "master"
+        ),
+        .package(
+            url: "https://github.com/leviouwendijk/TestFlows.git",
+            branch: "master"
+        ),
     ],
     targets: [
+        .systemLibrary(
+            name: "CLibLTC",
+            pkgConfig: "ltc",
+            providers: [
+                .brew([
+                    "libltc",
+                ]),
+            ]
+        ),
+        .target(
+            name: "MediaLTCBridge",
+            dependencies: [
+                "CLibLTC",
+            ],
+            publicHeadersPath: "include"
+        ),
         .target(
             name: "MediaCore"
         ),
@@ -56,10 +101,26 @@ let package = Package(
             ]
         ),
         .target(
+            name: "MediaPath",
+            dependencies: [
+                "MediaCore",
+                .product(
+                    name: "Path",
+                    package: "Path"
+                ),
+                .product(
+                    name: "FileTypes",
+                    package: "FileTypes"
+                ),
+            ]
+        ),
+        .target(
             name: "MediaLTC",
             dependencies: [
                 "MediaCore",
                 "MediaAV",
+                "MediaPath",
+                "MediaLTCBridge",
             ]
         ),
         .target(
@@ -67,6 +128,7 @@ let package = Package(
             dependencies: [
                 "MediaCore",
                 "MediaAV",
+                "MediaPath",
                 "MediaLTC",
             ]
         ),
@@ -77,6 +139,21 @@ let package = Package(
                 .product(
                     name: "Arguments",
                     package: "Arguments"
+                ),
+                .product(
+                    name: "Terminal",
+                    package: "Terminal"
+                ),
+            ]
+        ),
+        .executableTarget(
+            name: "MediaTestFlows",
+            dependencies: [
+                "Media",
+                "MediaLTCBridge",
+                .product(
+                    name: "TestFlows",
+                    package: "TestFlows"
                 ),
             ]
         ),

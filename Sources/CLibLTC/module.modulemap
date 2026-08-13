@@ -1,0 +1,5 @@
+module CLibLTC [system] {
+    header "shim.h"
+    link "ltc"
+    export *
+}

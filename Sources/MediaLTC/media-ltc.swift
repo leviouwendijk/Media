@@ -1,1 +1,1 @@
-import MediaCore
+public enum LTC {}

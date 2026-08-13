@@ -130,6 +130,94 @@ public extension MediaAudioBuffer {
         return output
     }
 
+    func forEachFloatSample(
+        channel: Int,
+        _ body: (Float) throws -> Void
+    ) throws {
+        guard channel >= 0,
+              channel < channelCount else {
+            throw MediaAudioBufferError.invalid_channel(
+                channel,
+                count: channelCount
+            )
+        }
+
+        guard frameCount > 0,
+              !data.isEmpty else {
+            return
+        }
+
+        try data.withUnsafeBytes { rawBuffer in
+            guard let base = rawBuffer.bindMemory(
+                to: UInt8.self
+            ).baseAddress else {
+                return
+            }
+
+            let resolvedFrameCount = min(
+                frameCount,
+                data.count / max(
+                    1,
+                    channelCount * sample.bytes
+                )
+            )
+
+            guard resolvedFrameCount > 0 else {
+                return
+            }
+
+            for frameIndex in 0..<resolvedFrameCount {
+                let sampleIndex = frameIndex
+                    * channelCount
+                    + channel
+
+                let offset = sampleIndex
+                    * sample.bytes
+
+                try body(
+                    Self.readFloat(
+                        from: base,
+                        offset: offset,
+                        sample: sample
+                    )
+                )
+            }
+        }
+    }
+
+    func appendFloatSamples(
+        channel: Int,
+        to output: inout [Float]
+    ) throws {
+        try forEachFloatSample(
+            channel: channel
+        ) { sample in
+            output.append(
+                sample
+            )
+        }
+    }
+
+    func floatSamples(
+        channel: Int
+    ) throws -> [Float] {
+        var output: [Float] = []
+
+        output.reserveCapacity(
+            max(
+                0,
+                frameCount
+            )
+        )
+
+        try appendFloatSamples(
+            channel: channel,
+            to: &output
+        )
+
+        return output
+    }
+
     func mapFloatSamples(
         _ transform: (Float) throws -> Float
     ) rethrows -> MediaAudioBuffer {
