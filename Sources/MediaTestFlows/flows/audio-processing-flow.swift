@@ -56,6 +56,73 @@ extension MediaFlowSuite {
                 )
             }
 
+            Step("analysis format conversion preserves streaming duration at 16 kHz") {
+                let sampleRate = 48_000
+                let samples = sine(
+                    frequency: 181,
+                    amplitude: 0.2,
+                    count: sampleRate,
+                    sampleRate: sampleRate
+                )
+
+                let midpoint = samples.count / 2
+                let first = Array(
+                    samples[..<midpoint]
+                )
+                let second = Array(
+                    samples[midpoint...]
+                )
+
+                var converter = Audio.Processing.AnalysisFormatConverter(
+                    targetSampleRate: 16_000
+                )
+
+                let firstResult = converter.process(
+                    MediaAudioBuffer(
+                        data: floatData(first),
+                        frameCount: first.count,
+                        packetCount: UInt32(first.count),
+                        sampleRate: sampleRate,
+                        channelCount: 1,
+                        sample: .float32,
+                        hostTimeSeconds: 0
+                    )
+                )
+
+                let secondResult = converter.process(
+                    MediaAudioBuffer(
+                        data: floatData(second),
+                        frameCount: second.count,
+                        packetCount: UInt32(second.count),
+                        sampleRate: sampleRate,
+                        channelCount: 1,
+                        sample: .float32,
+                        hostTimeSeconds: 0.5
+                    )
+                )
+
+                let frameCount = firstResult.buffer.frameCount
+                    + secondResult.buffer.frameCount
+
+                try Expect.equal(
+                    abs(frameCount - 16_000) <= 1,
+                    true,
+                    "audio-processing.analysis-format-duration"
+                )
+
+                try Expect.equal(
+                    firstResult.buffer.sampleRate,
+                    16_000,
+                    "audio-processing.analysis-format-rate"
+                )
+
+                try Expect.equal(
+                    firstResult.buffer.channelCount,
+                    1,
+                    "audio-processing.analysis-format-mono"
+                )
+            }
+
             Step("analysis enhancer remains bounded for hot input") {
                 let samples = sine(
                     frequency: 180,
