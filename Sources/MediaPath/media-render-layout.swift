@@ -64,8 +64,3 @@ public struct MediaRenderLayout: Sendable, Hashable {
     }
 }
 
-public extension MediaRenderLayout {
-    static let ltc = MediaRenderLayout(
-        prefix: "ltc-"
-    )
-}

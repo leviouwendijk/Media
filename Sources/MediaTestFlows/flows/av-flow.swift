@@ -285,7 +285,7 @@ extension MediaFlowSuite {
                 )
             }
 
-            Step("phase-aligned tmcd persists LTC boundary sample") {
+            Step("phase-aligned tmcd persists boundary sample") {
                 let workspace = try MediaTestWorkspace(
                     "av-timecode-phase"
                 )

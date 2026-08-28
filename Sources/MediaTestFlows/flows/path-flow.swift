@@ -118,7 +118,9 @@ extension MediaFlowSuite {
                     relative: "Canon/A001.MP4"
                 )
 
-                let plan = MediaRenderLayout.ltc.plan(
+                let plan = MediaRenderLayout(
+                    prefix: "render-"
+                ).plan(
                     source: sourceRoot,
                     sources: [
                         source,
@@ -127,7 +129,7 @@ extension MediaFlowSuite {
 
                 try Expect.equal(
                     plan.outputRoot.lastPathComponent,
-                    "ltc-shoot",
+                    "render-shoot",
                     "media-path.directory.output-root"
                 )
 
@@ -149,7 +151,7 @@ extension MediaFlowSuite {
                 )
             }
 
-            Step("single file render receives ltc prefix") {
+            Step("single file render receives configured prefix") {
                 let workspace = try MediaTestWorkspace(
                     "single-file-layout"
                 )
@@ -170,7 +172,9 @@ extension MediaFlowSuite {
                     source
                 )
 
-                let plan = MediaRenderLayout.ltc.plan(
+                let plan = MediaRenderLayout(
+                    prefix: "render-"
+                ).plan(
                     source: source,
                     sources: discovered
                 )
@@ -186,7 +190,7 @@ extension MediaFlowSuite {
 
                 try Expect.equal(
                     output.lastPathComponent,
-                    "ltc-A001.MP4",
+                    "render-A001.MP4",
                     "media-path.single.output"
                 )
             }

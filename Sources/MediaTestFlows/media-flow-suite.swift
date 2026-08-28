@@ -7,6 +7,5 @@ enum MediaFlowSuite: TestFlowRegistry {
         audioBufferFlow,
         pathFlow,
         avFlow,
-        ltcFlow,
     ]
 }

@@ -5,8 +5,7 @@ import PackageDescription
 let package = Package(
     name: "Media",
     platforms: [
-        // .macOS(.v14),
-        .macOS(.v26), // for using latest Homebrew libltc bottle
+        .macOS(.v26),
     ],
     products: [
         .library(
@@ -31,12 +30,6 @@ let package = Package(
             name: "MediaPath",
             targets: [
                 "MediaPath",
-            ]
-        ),
-        .library(
-            name: "MediaLTC",
-            targets: [
-                "MediaLTC",
             ]
         ),
         .executable(
@@ -75,22 +68,6 @@ let package = Package(
         ),
     ],
     targets: [
-        .systemLibrary(
-            name: "CLibLTC",
-            pkgConfig: "ltc",
-            providers: [
-                .brew([
-                    "libltc",
-                ]),
-            ]
-        ),
-        .target(
-            name: "MediaLTCBridge",
-            dependencies: [
-                "CLibLTC",
-            ],
-            publicHeadersPath: "include"
-        ),
         .target(
             name: "MediaCore"
         ),
@@ -115,21 +92,11 @@ let package = Package(
             ]
         ),
         .target(
-            name: "MediaLTC",
-            dependencies: [
-                "MediaCore",
-                "MediaAV",
-                "MediaPath",
-                "MediaLTCBridge",
-            ]
-        ),
-        .target(
             name: "Media",
             dependencies: [
                 "MediaCore",
                 "MediaAV",
                 "MediaPath",
-                "MediaLTC",
             ]
         ),
         .executableTarget(
@@ -150,7 +117,6 @@ let package = Package(
             name: "MediaTestFlows",
             dependencies: [
                 "Media",
-                "MediaLTCBridge",
                 .product(
                     name: "TestFlows",
                     package: "TestFlows"
