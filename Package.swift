@@ -21,6 +21,12 @@ let package = Package(
             ]
         ),
         .library(
+            name: "MediaAudio",
+            targets: [
+                "MediaAudio",
+            ]
+        ),
+        .library(
             name: "MediaAV",
             targets: [
                 "MediaAV",
@@ -72,6 +78,12 @@ let package = Package(
             name: "MediaCore"
         ),
         .target(
+            name: "MediaAudio",
+            dependencies: [
+                "MediaCore",
+            ]
+        ),
+        .target(
             name: "MediaAV",
             dependencies: [
                 "MediaCore",
@@ -95,6 +107,7 @@ let package = Package(
             name: "Media",
             dependencies: [
                 "MediaCore",
+                "MediaAudio",
                 "MediaAV",
                 "MediaPath",
             ]
