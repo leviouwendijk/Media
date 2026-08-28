@@ -5,6 +5,7 @@ enum MediaFlowSuite: TestFlowRegistry {
 
     static let flows: [TestFlow] = [
         audioBufferFlow,
+        audioTimeFlow,
         pathFlow,
         avFlow,
     ]

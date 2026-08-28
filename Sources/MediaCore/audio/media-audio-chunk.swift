@@ -1,5 +1,4 @@
 import Foundation
-import MediaCore
 
 public struct MediaAudioChunk: Sendable {
     public let trackID: Int32
@@ -17,5 +16,18 @@ public struct MediaAudioChunk: Sendable {
         self.buffer = buffer
         self.presentationTimeSeconds = presentationTimeSeconds
         self.durationSeconds = durationSeconds
+    }
+
+    public var timeRange: Audio.TimeRange? {
+        guard let presentationTimeSeconds,
+              let durationSeconds
+        else {
+            return nil
+        }
+
+        return .init(
+            start: presentationTimeSeconds,
+            duration: durationSeconds
+        )
     }
 }
