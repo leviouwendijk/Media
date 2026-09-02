@@ -27,7 +27,7 @@ public extension Audio {
             bits / 8
         }
 
-        internal var isFloat: Bool {
+        public var isFloat: Bool {
             switch self {
             case .float32:
                 return true

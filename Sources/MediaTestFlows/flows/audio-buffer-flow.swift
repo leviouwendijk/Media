@@ -12,6 +12,29 @@ extension MediaFlowSuite {
                 "buffer",
             ]
         ) {
+            Step("sample representation exposes storage metadata") {
+                try Expect.equal(
+                    Audio.Sample.float32.isFloat,
+                    true,
+                    "audio-sample.float32-is-float"
+                )
+                try Expect.equal(
+                    Audio.Sample.int16.isFloat,
+                    false,
+                    "audio-sample.int16-is-float"
+                )
+                try Expect.equal(
+                    Audio.Sample.int24.bytes,
+                    3,
+                    "audio-sample.int24-bytes"
+                )
+                try Expect.equal(
+                    Audio.Sample.int32.bits,
+                    32,
+                    "audio-sample.int32-bits"
+                )
+            }
+
             Step("float32 stereo samples mix down to mono") {
                 let buffer = MediaAudioBuffer(
                     data: floatData(
