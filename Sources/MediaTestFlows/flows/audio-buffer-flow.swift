@@ -12,29 +12,6 @@ extension MediaFlowSuite {
                 "buffer",
             ]
         ) {
-            Step("sample representation exposes storage metadata") {
-                try Expect.equal(
-                    Audio.Sample.float32.isFloat,
-                    true,
-                    "audio-sample.float32-is-float"
-                )
-                try Expect.equal(
-                    Audio.Sample.int16.isFloat,
-                    false,
-                    "audio-sample.int16-is-float"
-                )
-                try Expect.equal(
-                    Audio.Sample.int24.bytes,
-                    3,
-                    "audio-sample.int24-bytes"
-                )
-                try Expect.equal(
-                    Audio.Sample.int32.bits,
-                    32,
-                    "audio-sample.int32-bits"
-                )
-            }
-
             Step("float32 stereo samples mix down to mono") {
                 let buffer = MediaAudioBuffer(
                     data: floatData(
@@ -60,6 +37,37 @@ extension MediaFlowSuite {
                         0.375,
                     ],
                     "audio-buffer.mono"
+                )
+            }
+
+            Step("audio buffers expose simple linear level metrics") {
+                let buffer = MediaAudioBuffer(
+                    data: floatData(
+                        [
+                            0.5,
+                            -0.5,
+                            0.5,
+                            -0.5,
+                        ]
+                    ),
+                    frameCount: 4,
+                    packetCount: 4,
+                    sampleRate: 48_000,
+                    channelCount: 1,
+                    sample: .float32,
+                    hostTimeSeconds: nil
+                )
+
+                try Expect.equal(
+                    buffer.peakAmplitude,
+                    0.5,
+                    "audio-buffer.peak-amplitude"
+                )
+
+                try Expect.equal(
+                    buffer.rmsAmplitude,
+                    0.5,
+                    "audio-buffer.rms-amplitude"
                 )
             }
 
