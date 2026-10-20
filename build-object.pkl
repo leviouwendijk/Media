@@ -1,0 +1,17 @@
+uuid = "3E6DDD6D-3CEF-4B17-A644-C0E092A1E969"
+name = "Media"
+types { "library" }
+versions {
+    release {
+        major = 0
+        minor = 1
+        patch = 0
+    }
+}
+compile {
+    use = true
+    arguments { "--products" "media" }
+}
+details = ""
+author = "levi"
+update = "https://raw.githubusercontent.com/leviouwendijk/Media/master/build-object.pkl"

@@ -38,12 +38,14 @@ let package = Package(
                 "MediaPath",
             ]
         ),
+
         .executable(
             name: "media",
             targets: [
                 "MediaCLI",
             ]
         ),
+
         .executable(
             name: "mediatest",
             targets: [
