@@ -111,6 +111,11 @@ private extension MediaAssetAudioReader {
                 )
             }
         }
+        guard reader.status == .completed else {
+            throw MediaAudioReadError.reader_failed(
+                reader.error?.localizedDescription ?? "Reader ended without completion."
+            )
+        }
     }
 
     func chunk(

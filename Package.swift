@@ -39,6 +39,10 @@ let package = Package(
             ]
         ),
 
+        .library(
+            name: "MediaTranscoding",
+            targets: ["MediaTranscoding"]
+        ),
         .executable(
             name: "media",
             targets: [
@@ -106,12 +110,17 @@ let package = Package(
             ]
         ),
         .target(
+            name: "MediaTranscoding",
+            dependencies: ["MediaCore", "MediaAV"]
+        ),
+        .target(
             name: "Media",
             dependencies: [
                 "MediaCore",
                 "MediaAudio",
                 "MediaAV",
                 "MediaPath",
+                "MediaTranscoding",
             ]
         ),
         .executableTarget(
