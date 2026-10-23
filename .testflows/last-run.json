@@ -3,12 +3,12 @@
   "failed_names" : [
 
   ],
-  "generated_at" : "2026-10-23T15:29:39Z",
+  "generated_at" : "2026-10-23T15:46:07Z",
   "passed" : 7,
   "results" : [
     {
       "display_name" : "audio-buffer",
-      "duration_seconds" : 0.0016760826110839844,
+      "duration_seconds" : 0.002267003059387207,
       "name" : "audio-buffer",
       "status" : "passed",
       "tags" : [
@@ -19,7 +19,7 @@
     },
     {
       "display_name" : "audio-processing",
-      "duration_seconds" : 0.07097303867340088,
+      "duration_seconds" : 0.07737302780151367,
       "name" : "audio-processing",
       "status" : "passed",
       "tags" : [
@@ -30,7 +30,7 @@
     },
     {
       "display_name" : "audio-time",
-      "duration_seconds" : 0.0005470514297485352,
+      "duration_seconds" : 0.001043081283569336,
       "name" : "audio-time",
       "status" : "passed",
       "tags" : [
@@ -41,7 +41,7 @@
     },
     {
       "display_name" : "media-path",
-      "duration_seconds" : 0.010277986526489258,
+      "duration_seconds" : 0.00999903678894043,
       "name" : "media-path",
       "status" : "passed",
       "tags" : [
@@ -52,7 +52,7 @@
     },
     {
       "display_name" : "media-av",
-      "duration_seconds" : 0.29139602184295654,
+      "duration_seconds" : 0.34110701084136963,
       "name" : "media-av",
       "status" : "passed",
       "tags" : [
@@ -63,7 +63,7 @@
     },
     {
       "display_name" : "audio-transcoding",
-      "duration_seconds" : 0.002460002899169922,
+      "duration_seconds" : 0.0022329092025756836,
       "name" : "audio-transcoding",
       "status" : "passed",
       "tags" : [
@@ -73,7 +73,7 @@
     },
     {
       "display_name" : "audio-channel-selection",
-      "duration_seconds" : 0.0002040863037109375,
+      "duration_seconds" : 0.0002028942108154297,
       "name" : "audio-channel-selection",
       "status" : "passed",
       "tags" : [
