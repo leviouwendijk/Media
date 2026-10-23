@@ -41,7 +41,8 @@ public struct MediaAudioTranscoder: Sendable {
     public func transcode(
         _ source: URL,
         to destination: URL,
-        using encoder: any MediaAudioEncoder
+        using encoder: any MediaAudioEncoder,
+        channelIndex: Int? = nil
     ) async throws -> MediaAudioTranscodeResult {
         let source = source.standardizedFileURL
         let destination = destination.standardizedFileURL
@@ -64,7 +65,11 @@ public struct MediaAudioTranscoder: Sendable {
 
         let collector = MediaAudioEncodeCollector(encoder: encoder, output: temporary)
         try await MediaAssetAudioReader().read(source) { chunk in
-            try collector.consume(chunk.buffer)
+            if let channelIndex {
+                try collector.consume(try chunk.buffer.selectingChannel(channelIndex))
+            } else {
+                try collector.consume(chunk.buffer)
+            }
         }
         let sourceInfo = try collector.finish()
 

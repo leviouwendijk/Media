@@ -12,6 +12,7 @@ compile {
     use = true
     arguments { "--products" "media" }
 }
+tests { primary = "mediatest" }
 details = ""
 author = "levi"
 update = "https://raw.githubusercontent.com/leviouwendijk/Media/master/build-object.pkl"

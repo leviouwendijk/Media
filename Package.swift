@@ -50,6 +50,7 @@ let package = Package(
             ]
         ),
 
+        // test binary
         .executable(
             name: "mediatest",
             targets: [

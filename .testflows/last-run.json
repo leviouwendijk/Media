@@ -3,12 +3,12 @@
   "failed_names" : [
 
   ],
-  "generated_at" : "2026-10-20T15:54:53Z",
-  "passed" : 6,
+  "generated_at" : "2026-10-23T15:21:48Z",
+  "passed" : 7,
   "results" : [
     {
       "display_name" : "audio-buffer",
-      "duration_seconds" : 0.0016080141067504883,
+      "duration_seconds" : 0.0017669200897216797,
       "name" : "audio-buffer",
       "status" : "passed",
       "tags" : [
@@ -19,7 +19,7 @@
     },
     {
       "display_name" : "audio-processing",
-      "duration_seconds" : 0.09229600429534912,
+      "duration_seconds" : 0.08036494255065918,
       "name" : "audio-processing",
       "status" : "passed",
       "tags" : [
@@ -30,7 +30,7 @@
     },
     {
       "display_name" : "audio-time",
-      "duration_seconds" : 0.0003560781478881836,
+      "duration_seconds" : 0.00039505958557128906,
       "name" : "audio-time",
       "status" : "passed",
       "tags" : [
@@ -41,7 +41,7 @@
     },
     {
       "display_name" : "media-path",
-      "duration_seconds" : 0.007409930229187012,
+      "duration_seconds" : 0.011922001838684082,
       "name" : "media-path",
       "status" : "passed",
       "tags" : [
@@ -52,7 +52,7 @@
     },
     {
       "display_name" : "media-av",
-      "duration_seconds" : 0.7091810703277588,
+      "duration_seconds" : 0.6722500324249268,
       "name" : "media-av",
       "status" : "passed",
       "tags" : [
@@ -63,16 +63,27 @@
     },
     {
       "display_name" : "audio-transcoding",
-      "duration_seconds" : 0.0053119659423828125,
+      "duration_seconds" : 0.0020360946655273438,
       "name" : "audio-transcoding",
       "status" : "passed",
       "tags" : [
         "audio",
         "transcoding"
       ]
+    },
+    {
+      "display_name" : "audio-channel-selection",
+      "duration_seconds" : 0.0002200603485107422,
+      "name" : "audio-channel-selection",
+      "status" : "passed",
+      "tags" : [
+        "audio",
+        "channels",
+        "pcm"
+      ]
     }
   ],
   "skipped" : 0,
   "title" : "Media",
-  "total" : 6
+  "total" : 7
 }
