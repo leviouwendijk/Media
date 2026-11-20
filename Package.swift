@@ -49,14 +49,6 @@ let package = Package(
                 "MediaCLI",
             ]
         ),
-
-        // test binary
-        .executable(
-            name: "mediatest",
-            targets: [
-                "MediaTestFlows",
-            ]
-        ),
     ],
     dependencies: [
         .package(
@@ -73,10 +65,6 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/leviouwendijk/FileTypes.git",
-            branch: "master"
-        ),
-        .package(
-            url: "https://github.com/leviouwendijk/TestFlows.git",
             branch: "master"
         ),
     ],
@@ -135,16 +123,6 @@ let package = Package(
                 .product(
                     name: "Terminal",
                     package: "Terminal"
-                ),
-            ]
-        ),
-        .executableTarget(
-            name: "MediaTestFlows",
-            dependencies: [
-                "Media",
-                .product(
-                    name: "TestFlows",
-                    package: "TestFlows"
                 ),
             ]
         ),
